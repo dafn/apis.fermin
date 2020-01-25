@@ -1,0 +1,6 @@
+-- Your SQL goes here
+CREATE TABLE notes (
+  id SERIAL PRIMARY KEY,
+  content TEXT NOT NULL,
+  created DATE NOT NULL DEFAULT CURRENT_DATE
+)
