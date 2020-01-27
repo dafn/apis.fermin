@@ -4,12 +4,12 @@ use std::path::Path;
 
 #[get("/")]
 pub fn index() -> Result<NamedFile, Status> {
-	let path = Path::new("../static/").join("index.html");
+	let path = Path::new("../../frontend/dist/").join("index.html");
 	NamedFile::open(&path).map_err(|_| Status::NotFound)
 }
 
 #[get("/<file>")]
 pub fn static_files(file: String) -> Result<NamedFile, Status> {
-	let path = Path::new("../static/").join(file);
+	let path = Path::new("../../frontend/dist/").join(file);
 	NamedFile::open(&path).map_err(|_| Status::NotFound)
 }
