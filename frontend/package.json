@@ -20,5 +20,8 @@
   },
   "browserslist": [
     "last 1 chrome versions"
-  ]
+  ],
+  "alias": {
+    "src": "./src"
+  }
 }
