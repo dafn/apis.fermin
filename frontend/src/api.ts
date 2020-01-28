@@ -1,17 +1,17 @@
 interface Note {
   content: String;
   created: Date;
-  id: number;
+  id?: number;
 }
 
 let mock: Note[] = [
   {
-    id: 1,
+    id: 0,
     content: "Note 1",
     created: new Date()
   },
   {
-    id: 2,
+    id: 1,
     content: "Note 2",
     created: new Date()
   }

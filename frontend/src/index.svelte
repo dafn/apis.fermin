@@ -1,11 +1,23 @@
 <script>
   import { onMount } from "svelte";
-  import { getAllNotes } from "src/api";
+  import { getAllNotes, postNote } from "src/api";
 
+  
   let notes = [];
   onMount(() => {
     notes = getAllNotes();
   });
+
+  let textarea;
+
+  const saveNote = () => {
+    postNote({
+      content: textarea,
+      created: new Date()
+    })
+    notes = getAllNotes()
+  }
+
 </script>
 
 <style lang="scss">
@@ -24,10 +36,11 @@
 </style>
 
 <section class="main-container">
-  <textarea name="note" cols="40" rows="5" />
+  <textarea name="note" cols="40" rows="5" bind:value={textarea} />
   <section>
     {#each notes as { content }}
       <p>{content}</p>
     {/each}
   </section>
+  <button on:click={saveNote} > Save </button>
 </section>
