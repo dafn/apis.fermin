@@ -18,17 +18,11 @@ use router::{api, catcher, webapp};
 fn main() {
 	dotenv().ok();
 
-	let connection = db::connect();
-
-	db::get_notes(&connection);
-
-	db::post(&connection, &"test");
-
 	rocket::ignite()
 		.mount("/", routes![webapp::index, webapp::static_files])
 		.mount(
 			"/api/notes",
-			routes![api::notes::get_by_id, api::notes::get_all],
+			routes![api::notes::get_by_id, api::notes::get_all, api::notes::post],
 		)
 		.register(catchers![catcher::catch_404, catcher::catch_500])
 		.launch();

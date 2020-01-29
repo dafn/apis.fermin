@@ -23,20 +23,19 @@ pub fn get_notes(connection: &PgConnection) {
 
   for note in results {
     println!("{}", note.id);
-    println!("----------\n");
     println!("{}", note.content);
   }
 }
 
-pub fn post<'a>(connection: &PgConnection, new_content: &str) -> Note {
+pub fn post<'a>(connection: &PgConnection, new_content: &str) {
   use schema::notes;
 
   let new_note = NewNote {
-    content: new_content
+    content: new_content,
   };
 
   diesel::insert_into(notes::table)
     .values(&new_note)
-    .get_result(connection)
-    .expect("Error saving new note")
+    .execute(connection)
+    .expect("Error saving new note");
 }
