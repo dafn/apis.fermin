@@ -1,7 +1,7 @@
 table! {
     notes (id) {
-        id -> Int4,
+        id -> Integer,
         content -> Text,
-        created -> Date,
+        created -> Timestamp,
     }
 }
