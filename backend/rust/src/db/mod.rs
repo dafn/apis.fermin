@@ -15,7 +15,7 @@ pub fn connect() -> PgConnection {
 
 pub fn get_notes(connection: &PgConnection) {
   let results = notes
-    .limit(5)
+    .limit(50)
     .load::<Note>(connection)
     .expect("Error loading notes");
 

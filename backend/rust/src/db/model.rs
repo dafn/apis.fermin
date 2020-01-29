@@ -5,7 +5,6 @@ use super::schema::notes;
 pub struct Note {
     pub id: i32,
     pub content: String,
-    pub created: NaiveDateTime,
 }
 
 
