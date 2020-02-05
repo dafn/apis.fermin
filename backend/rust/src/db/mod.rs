@@ -16,7 +16,7 @@ pub fn get_notes(connection: &PgConnection) -> Vec<Note> {
   let result = notes
     .limit(5)
     .load::<Note>(connection)
-    .expect("CError loading notes");
+    .expect("Error loading notes");
 
   println!("Displaying {} notes", result.len());
 
@@ -40,4 +40,9 @@ pub fn post_note<'a>(connection: &PgConnection, new_content: &'a str) -> usize {
     .expect("Error saving new note");
 
   result
+}
+
+pub fn get_by_id(connection: &PgConnection, _id: i32) -> Vec<Note> {
+  let actual_data: Vec<_> = notes.select((id, content)).filter(id.eq(&_id)).load(connection).unwrap();
+  actual_data
 }

@@ -13,8 +13,12 @@ pub fn get_all() -> String {
 }
 
 #[get("/<id>")]
-pub fn get_by_id(id: usize) -> String {
-  format!("Note with id '{}'", id)
+pub fn get_by_id(id: i32) -> String {
+
+  #[derive(RustcDecodable, RustcEncodable)]
+  let result: Vec<Note> = db::get_by_id(&connect(), id);
+
+  json::encode(&result).unwrap()
 }
 
 #[post("/<content>")]
