@@ -1,4 +1,3 @@
-use chrono::NaiveDate;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use model::{NewNote, Note};
@@ -13,29 +12,32 @@ pub fn connect() -> PgConnection {
   PgConnection::establish(&database_url).expect(&format!("Error connecting to {}", database_url))
 }
 
-pub fn get_notes(connection: &PgConnection) {
-  let results = notes
-    .limit(50)
+pub fn get_notes(connection: &PgConnection) -> Vec<Note> {
+  let result = notes
+    .limit(5)
     .load::<Note>(connection)
-    .expect("Error loading notes");
+    .expect("CError loading notes");
 
-  println!("Displaying {} notes", results.len());
+  println!("Displaying {} notes", result.len());
 
-  for note in results {
+  for note in &result {
     println!("{}", note.id);
-    println!("{}", note.content);
   }
+
+  result
 }
 
-pub fn post<'a>(connection: &PgConnection, new_content: &str) {
+pub fn post_note<'a>(connection: &PgConnection, new_content: &'a str) -> usize {
   use schema::notes;
 
   let new_note = NewNote {
     content: new_content,
   };
 
-  diesel::insert_into(notes::table)
+  let result = diesel::insert_into(notes::table)
     .values(&new_note)
     .execute(connection)
     .expect("Error saving new note");
+
+  result
 }

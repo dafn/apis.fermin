@@ -9,5 +9,6 @@ edition = "2018"
 [dependencies]
 rocket = "0.4.2"
 diesel = { version = "1.0.0", features = ["postgres", "chrono"] }
+rustc-serialize = "0.3"
 dotenv = "0.9.0"
 chrono = "0.4"

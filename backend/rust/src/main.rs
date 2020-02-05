@@ -8,22 +8,27 @@ extern crate diesel;
 
 extern crate chrono;
 extern crate dotenv;
+extern crate rustc_serialize;
 
 mod db;
 mod router;
 
 use dotenv::dotenv;
-use router::{api, catcher, webapp};
+use rocket::error::LaunchError;
+use router::{api::notes, catcher, webapp};
 
 fn main() {
 	dotenv().ok();
 
-	rocket::ignite()
+	let error: LaunchError = rocket::ignite()
 		.mount("/", routes![webapp::index, webapp::static_files])
 		.mount(
 			"/api/notes",
-			routes![api::notes::get_by_id, api::notes::get_all, api::notes::post],
+			routes![notes::get_by_id, notes::get_all, notes::post],
 		)
 		.register(catchers![catcher::catch_404, catcher::catch_500])
 		.launch();
+
+	println!("Whoops! Rocket didn't launch!");
+	println!("This went wrong: {}", error);
 }
