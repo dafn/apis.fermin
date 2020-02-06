@@ -42,7 +42,6 @@ pub fn post_note<'a>(connection: &PgConnection, new_content: &'a str) -> usize {
   result
 }
 
-pub fn get_by_id(connection: &PgConnection, _id: i32) -> Vec<Note> {
-  let actual_data: Vec<_> = notes.select((id, content)).filter(id.eq(&_id)).load(connection).unwrap();
-  actual_data
+pub fn get_by_id<'a>(connection: &PgConnection, _id: &'a i32) -> Vec<Note> {
+  notes.select((id, content)).filter(id.eq(_id)).limit(1).load(connection).unwrap()
 }
