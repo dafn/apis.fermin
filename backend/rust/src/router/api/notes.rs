@@ -1,31 +1,46 @@
-use crate::db;
 use crate::db::connect;
 use crate::db::model::Note;
+
+use rocket::response::status;
+use rocket::http::Status;
 
 use rustc_serialize::json;
 
 #[get("/")]
 pub fn get_all() -> String {
-  #[derive(RustcDecodable, RustcEncodable)]
-  let all_notes: Vec<Note> = db::get_notes(&connect());
-
-  json::encode(&all_notes).unwrap()
+  json::encode(&Note::get_all(&connect())).unwrap()
 }
 
 #[get("/<id>")]
-pub fn get_by_id(id: i32) -> String {
-  #[derive(RustcDecodable, RustcEncodable)]
-  let result: Vec<Note> = db::get_by_id(&connect(), &id);
+pub fn get_by_id(id: i32) -> Result<String, status::NotFound<String>> {
+  let result = Note::get_by_id(&connect(), &id);
 
-  json::encode(&result).unwrap()
+  match result {
+    Ok(note) => Ok(json::encode(&note).unwrap()),
+    Err(_) => Err(status::NotFound(format!("Could not find note with id {}", &id)))
+  }
 }
 
 #[post("/<content>")]
-pub fn post(content: String) {
-  db::post_note(&connect(), &content);
+pub fn post(content: String) -> Status {
+  match Note::post(&connect(), &content) {
+    true => Status::Accepted,
+    false => Status::InternalServerError
+  }
+}
+
+#[put("/<id>/<content>")]
+pub fn put(id: i32, content: String) -> Status {
+  match Note::put(&connect(), &id, &content) {
+    true => Status::Accepted,
+    false => Status::NotFound
+  }
 }
 
 #[delete("/<id>")]
-pub fn delete(id: usize) {
-  // todo: delete
+pub fn delete(id: i32) -> Status {
+  match Note::delete(&connect(), &id) {
+    true => Status::Accepted,
+    false => Status::NotFound
+  }
 }

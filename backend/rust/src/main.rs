@@ -24,7 +24,7 @@ fn main() {
 		.mount("/", routes![webapp::index, webapp::static_files])
 		.mount(
 			"/api/notes",
-			routes![notes::get_by_id, notes::get_all, notes::post],
+			routes![notes::get_all, notes::get_by_id, notes::post, notes::put, notes::delete],
 		)
 		.register(catchers![catcher::catch_404, catcher::catch_500])
 		.launch();
