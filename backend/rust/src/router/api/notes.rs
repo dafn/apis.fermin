@@ -13,9 +13,7 @@ pub fn get_all() -> String {
 
 #[get("/<id>")]
 pub fn get_by_id(id: i32) -> Result<String, status::NotFound<String>> {
-  let result = Note::get_by_id(&connect(), &id);
-
-  match result {
+  match Note::get_by_id(&connect(), &id) {
     Ok(note) => Ok(json::encode(&note).unwrap()),
     Err(_) => Err(status::NotFound(format!("Could not find note with id {}", &id)))
   }
@@ -24,7 +22,7 @@ pub fn get_by_id(id: i32) -> Result<String, status::NotFound<String>> {
 #[post("/<content>")]
 pub fn post(content: String) -> Status {
   match Note::post(&connect(), &content) {
-    true => Status::Accepted,
+    true => Status::Created,
     false => Status::InternalServerError
   }
 }
@@ -32,7 +30,7 @@ pub fn post(content: String) -> Status {
 #[put("/<id>/<content>")]
 pub fn put(id: i32, content: String) -> Status {
   match Note::put(&connect(), &id, &content) {
-    true => Status::Accepted,
+    true => Status::Ok,
     false => Status::NotFound
   }
 }
@@ -40,7 +38,7 @@ pub fn put(id: i32, content: String) -> Status {
 #[delete("/<id>")]
 pub fn delete(id: i32) -> Status {
   match Note::delete(&connect(), &id) {
-    true => Status::Accepted,
+    true => Status::Ok,
     false => Status::NotFound
   }
 }

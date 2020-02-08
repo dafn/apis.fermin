@@ -1,7 +1,5 @@
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use model::{NewNote, Note};
-use schema::notes::dsl::*;
 use std::env;
 
 pub mod model;
