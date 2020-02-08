@@ -1,23 +1,24 @@
 use crate::db::connect;
 use crate::db::model::Note;
 
-use rocket::response::status;
 use rocket::response::content::Json;
-
 use rocket::http::Status;
 
 use rustc_serialize::json;
 
 #[get("/")]
-pub fn get_all() -> Json<String> {
-  Json(json::encode(&Note::get_all(&connect())).unwrap())
+pub fn get_all() -> Result<Json<String>, Status> {
+  match json::encode(&Note::get_all(&connect())) {
+    Ok(json) => Ok(Json(json)),
+    Err(_) => Err(Status::InternalServerError)
+  }
 }
 
 #[get("/<id>")]
-pub fn get_by_id(id: i32) -> Result<Json<String>, status::NotFound<String>> {
+pub fn get_by_id(id: i32) -> Result<Json<String>, Status> {
   match Note::get_by_id(&connect(), &id) {
     Ok(note) => Ok(Json(json::encode(&note).unwrap())),
-    Err(_) => Err(status::NotFound(format!("Could not find note with id {}", &id)))
+    Err(_) => Err(Status::NotFound)
   }
 }
 
