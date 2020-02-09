@@ -22,7 +22,7 @@ pub fn get_by_id(db_connection: DbConnection, id: i32) -> Result<Json<String>, S
   }
 }
 
-#[post("/<content>")]
+#[post("/", data = "<content>")]
 pub fn post(db_connection: DbConnection, content: String) -> Status {
   match Note::post(&db_connection, &content) {
     Ok(_) => Status::Created,
@@ -30,7 +30,7 @@ pub fn post(db_connection: DbConnection, content: String) -> Status {
   }
 }
 
-#[put("/<id>/<content>")]
+#[put("/<id>", data = "<content>")]
 pub fn put(db_connection: DbConnection, id: i32, content: String) -> Status {
   match Note::put(&db_connection, &id, &content) {
     Ok(_) => Status::Ok,
