@@ -8,8 +8,8 @@ use rustc_serialize::json;
 
 #[get("/")]
 pub fn get_all() -> Result<Json<String>, Status> {
-  match json::encode(&Note::get_all(&connect())) {
-    Ok(json) => Ok(Json(json)),
+  match Note::get_all(&connect()) {
+    Ok(all_notes) => Ok(Json(json::encode(&all_notes).unwrap())),
     Err(_) => Err(Status::InternalServerError)
   }
 }
@@ -25,23 +25,23 @@ pub fn get_by_id(id: i32) -> Result<Json<String>, Status> {
 #[post("/<content>")]
 pub fn post(content: String) -> Status {
   match Note::post(&connect(), &content) {
-    true => Status::Created,
-    false => Status::InternalServerError
+    Ok(_) => Status::Created,
+    Err(_) => Status::InternalServerError
   }
 }
 
 #[put("/<id>/<content>")]
 pub fn put(id: i32, content: String) -> Status {
   match Note::put(&connect(), &id, &content) {
-    true => Status::Ok,
-    false => Status::NotFound
+    Ok(_) => Status::Ok,
+    Err(_) => Status::NotFound
   }
 }
 
 #[delete("/<id>")]
 pub fn delete(id: i32) -> Status {
   match Note::delete(&connect(), &id) {
-    true => Status::Ok,
-    false => Status::NotFound
+    Ok(_) => Status::Ok,
+    Err(_) => Status::NotFound
   }
 }

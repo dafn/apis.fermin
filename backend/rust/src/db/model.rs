@@ -19,33 +19,29 @@ pub struct NewNote<'a> {
 }
 
 impl Note {
-  pub fn get_all(connection: &PgConnection) -> Vec<Note> {
+  pub fn get_all(connection: &PgConnection) -> Result<Vec<Note>, Error> {
     notes
-      .limit(5)
       .order(notes_schema::id.desc())
       .load::<Note>(connection)
-      .expect("Error loading notes")
   }
 
   pub fn get_by_id<'a>(connection: &PgConnection, _id: &'a i32) -> Result<Note, Error> {
     notes.find(_id).first::<Note>(connection)
   }
 
-  pub fn post<'a>(connection: &PgConnection, _content: &'a str) -> bool {
+  pub fn post<'a>(connection: &PgConnection, _content: &'a str) -> Result<usize, Error> {
     diesel::insert_into(notes_schema::table)
       .values(&NewNote { content: _content })
       .execute(connection)
-      .is_ok()
   }
 
-  pub fn put<'a, 'b>(connection: &PgConnection, _id: &'a i32, _content: &'b str) -> bool {
+  pub fn put<'a, 'b>(connection: &PgConnection, _id: &'a i32, _content: &'b str) -> Result<Note, Error> {
     diesel::update(notes.find(_id))
       .set(notes_schema::content.eq(_content))
       .get_result::<Note>(connection)
-      .is_ok()
   }
 
-  pub fn delete<'a>(connection: &PgConnection, _id: &'a i32) -> bool {
-    diesel::delete(notes.find(_id)).execute(connection).is_ok()
+  pub fn delete<'a>(connection: &PgConnection, _id: &'a i32) -> Result<usize, Error> {
+    diesel::delete(notes.find(_id)).execute(connection)
   }
 }
