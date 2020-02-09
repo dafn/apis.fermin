@@ -3,8 +3,8 @@ use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::result::*;
 
-use super::schema::notes as notes_schema;
-use super::schema::notes::dsl::notes;
+use crate::db::schema::notes as notes_schema;
+use crate::db::schema::notes::dsl::notes;
 
 #[derive(Queryable, RustcDecodable, RustcEncodable)]
 pub struct Note {

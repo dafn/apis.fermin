@@ -2,7 +2,7 @@ use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use std::env;
 
-pub mod model;
+pub mod models;
 pub mod schema;
 
 pub fn connect() -> PgConnection {

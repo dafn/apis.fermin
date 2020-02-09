@@ -1,5 +1,5 @@
 use crate::db::connect;
-use crate::db::model::Note;
+use crate::db::models::notes::Note;
 
 use rocket::response::content::Json;
 use rocket::http::Status;
