@@ -17,10 +17,15 @@ use dotenv::dotenv;
 use rocket::error::LaunchError;
 use router::{api::notes, catcher, webapp};
 
+use std::env;
+
 fn main() {
 	dotenv().ok();
 
+	let db_connection_pool = db::init_connection_pool(env::var("DATABASE_URL").expect("Could not find 'DATABASE_URL' in env"));
+
 	let error: LaunchError = rocket::ignite()
+		.manage(db_connection_pool)
 		.mount("/", routes![webapp::index, webapp::static_files])
 		.mount(
 			"/api/notes",
