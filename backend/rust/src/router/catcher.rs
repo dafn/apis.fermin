@@ -1,3 +1,4 @@
+/*
 use rocket::response::content::Html;
 use rocket::Request;
 
@@ -13,3 +14,4 @@ pub fn catch_404(req: &Request) -> Html<String> {
 pub fn catch_500() -> Html<String> {
 	Html(format!("<p>Internal Server Error. :(</p>"))
 }
+*/

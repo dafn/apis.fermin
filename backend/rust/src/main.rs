@@ -1,10 +1,13 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
-#[macro_use]
-extern crate rocket;
+// #[macro_use]
+// extern crate rocket;
 
 #[macro_use]
 extern crate diesel;
+
+#[macro_use]
+extern crate actix_web;
 
 extern crate dotenv;
 extern crate rustc_serialize;
@@ -12,27 +15,19 @@ extern crate rustc_serialize;
 mod db;
 mod router;
 
-use dotenv::dotenv;
-use rocket::error::LaunchError;
-use router::{api::notes, catcher, webapp};
+use actix_web::{middleware, web, App, HttpServer};
+use router::webapp;
 
-use std::env;
-
-fn main() {
-	dotenv().ok();
-
-	let db_connection_pool = db::init_connection_pool(env::var("DATABASE_URL").expect("Could not find 'DATABASE_URL' in env"));
-
-	let error: LaunchError = rocket::ignite()
-		.manage(db_connection_pool)
-		.mount("/", routes![webapp::index, webapp::static_files])
-		.mount(
-			"/api/notes",
-			routes![notes::get_all, notes::get_by_id, notes::post, notes::put, notes::delete],
-		)
-		.register(catchers![catcher::catch_404, catcher::catch_500])
-		.launch();
-
-	println!("Whoops! Rocket didn't launch!");
-	println!("This went wrong: {}", error);
+#[actix_rt::main]
+async fn main() -> std::io::Result<()> {
+	HttpServer::new(|| {
+		App::new()
+			.wrap(middleware::Compress::default())
+			.service(webapp::index)
+			.service(webapp::static_files)
+			// .service(web::scope("/api").service(webapp::index))
+	})
+	.bind("localhost:8088")?
+	.run()
+	.await
 }

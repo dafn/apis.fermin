@@ -1,15 +1,16 @@
-use rocket::http::Status;
-use rocket::response::NamedFile;
-use std::path::Path;
+use actix_files::NamedFile;
+use actix_web::{HttpRequest, Result};
+use std::path::{Path, PathBuf};
 
 #[get("/")]
-pub fn index() -> Result<NamedFile, Status> {
+pub async fn index() -> Result<NamedFile> {
 	let path = Path::new("../../frontend/dist/").join("index.html");
-	NamedFile::open(&path).map_err(|_| Status::NotFound)
+	Ok(NamedFile::open(path)?)
 }
 
-#[get("/<file>")]
-pub fn static_files(file: String) -> Result<NamedFile, Status> {
-	let path = Path::new("../../frontend/dist/").join(file);
-	NamedFile::open(&path).map_err(|_| Status::NotFound)
+#[get("/{filename:.*}")]
+pub async fn static_files(req: HttpRequest) -> Result<NamedFile> {
+	let filename: PathBuf = req.match_info().query("filename").parse().unwrap();
+	let path = Path::new("../../frontend/dist/").join(filename);
+	Ok(NamedFile::open(path)?)
 }
