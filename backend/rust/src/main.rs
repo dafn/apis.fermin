@@ -16,16 +16,28 @@ mod db;
 mod router;
 
 use actix_web::{middleware, web, App, HttpServer};
-use router::webapp;
+use dotenv::dotenv;
+use router::{api, webapp};
+
+use std::env;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+	dotenv().ok();
+
 	HttpServer::new(|| {
 		App::new()
+			.data(db::init_connection(
+				env::var("DATABASE_URL").expect("Could not find 'DATABASE_URL' in env"),
+			))
 			.wrap(middleware::Compress::default())
+			.service(
+				web::scope("/api")
+					.service(api::notes::get_all)
+					.service(api::notes::get_by_id),
+			)
 			.service(webapp::index)
 			.service(webapp::static_files)
-			// .service(web::scope("/api").service(webapp::index))
 	})
 	.bind("localhost:8088")?
 	.run()

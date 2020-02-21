@@ -35,7 +35,11 @@ impl Note {
       .execute(connection)
   }
 
-  pub fn put<'a, 'b>(connection: &PgConnection, _id: &'a i32, _content: &'b str) -> Result<Note, Error> {
+  pub fn put<'a, 'b>(
+    connection: &PgConnection,
+    _id: &'a i32,
+    _content: &'b str,
+  ) -> Result<Note, Error> {
     diesel::update(notes.find(_id))
       .set(notes_schema::content.eq(_content))
       .get_result::<Note>(connection)

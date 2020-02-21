@@ -1,26 +1,35 @@
-/*
-use crate::db::DbConnection;
 use crate::db::models::notes::Note;
+use crate::db::DbConnection;
 
-use actix_web::HttpResponse;
+use actix_web::{error, web, Error, HttpResponse};
 
 use rustc_serialize::json;
 
 #[get("/")]
-pub fn get_all(db_connection: DbConnection) -> HttpResponse {
-  match Note::get_all(&db_connection) {
-    Ok(all_notes) => Ok(Json(json::encode(&all_notes).unwrap())),
-    Err(_) => Err(Status::InternalServerError)
-  }
-}
-#[get("/<id>")]
-pub fn get_by_id(db_connection: DbConnection, id: i32) -> Result<Json<String>, Status> {
-  match Note::get_by_id(&db_connection, &id) {
-    Ok(note) => Ok(Json(json::encode(&note).unwrap())),
-    Err(_) => Err(Status::NotFound)
+pub async fn get_all(db: DbConnection) -> Result<HttpResponse, Error> {
+  match Note::get_all(&db.get().unwrap()) {
+    Ok(all_notes) => Ok(
+      HttpResponse::Ok()
+        .content_type("application/json")
+        .body(json::encode(&all_notes).unwrap()),
+    ),
+    Err(_) => Err(error::ErrorNotFound("File Not Found")),
   }
 }
 
+#[get("/{id}")]
+pub async fn get_by_id(id: web::Path<i32>, db: DbConnection) -> Result<HttpResponse, Error> {
+  match Note::get_by_id(&db.get().unwrap(), &id) {
+    Ok(note) => Ok(
+      HttpResponse::Ok()
+        .content_type("application/json")
+        .body(json::encode(&note).unwrap()),
+    ),
+    Err(_) => Err(error::ErrorNotFound("File Not Found")),
+  }
+}
+
+/*
 #[post("/", data = "<content>")]
 pub fn post(db_connection: DbConnection, content: String) -> Status {
   match Note::post(&db_connection, &content) {
