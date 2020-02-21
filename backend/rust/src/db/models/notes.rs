@@ -6,7 +6,9 @@ use diesel::result::*;
 use crate::db::schema::notes as notes_schema;
 use crate::db::schema::notes::dsl::notes;
 
-#[derive(Queryable, RustcDecodable, RustcEncodable)]
+use serde::{Serialize, Deserialize};
+
+#[derive(Queryable, Serialize, Deserialize)]
 pub struct Note {
   pub id: i32,
   pub content: String,

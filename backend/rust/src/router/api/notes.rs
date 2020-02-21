@@ -1,43 +1,43 @@
 use crate::db::models::notes::Note;
-use crate::db::DbConnection;
+use crate::db::DBPool;
 
-use actix_web::{error, web, Error, HttpResponse};
+use actix_web::{error, web, Error, HttpResponse, http::StatusCode};
+use serde::{Serialize, Deserialize};
 
-use rustc_serialize::json;
+#[derive(Serialize, Deserialize)]
+pub struct NewNoteWithoutLifetime {
+  content: String
+}
 
 #[get("/")]
-pub async fn get_all(db: DbConnection) -> Result<HttpResponse, Error> {
+pub async fn get_all(db: DBPool) -> Result<HttpResponse, Error> {
   match Note::get_all(&db.get().unwrap()) {
     Ok(all_notes) => Ok(
-      HttpResponse::Ok()
-        .content_type("application/json")
-        .body(json::encode(&all_notes).unwrap()),
+      HttpResponse::Ok().json(&all_notes)
     ),
     Err(_) => Err(error::ErrorNotFound("File Not Found")),
   }
 }
 
 #[get("/{id}")]
-pub async fn get_by_id(id: web::Path<i32>, db: DbConnection) -> Result<HttpResponse, Error> {
+pub async fn get_by_id(id: web::Path<i32>, db: DBPool) -> Result<HttpResponse, Error> {
   match Note::get_by_id(&db.get().unwrap(), &id) {
     Ok(note) => Ok(
-      HttpResponse::Ok()
-        .content_type("application/json")
-        .body(json::encode(&note).unwrap()),
+      HttpResponse::Ok().json(&note)
     ),
     Err(_) => Err(error::ErrorNotFound("File Not Found")),
   }
 }
 
-/*
-#[post("/", data = "<content>")]
-pub fn post(db_connection: DbConnection, content: String) -> Status {
-  match Note::post(&db_connection, &content) {
-    Ok(_) => Status::Created,
-    Err(_) => Status::InternalServerError
+#[post("/")]
+pub async fn post(new_note: web::Json<NewNoteWithoutLifetime>, db: DBPool) -> Result<HttpResponse, Error> {
+  match Note::post(&db.get().unwrap(), &new_note.content) {
+    Ok(_) => Ok(HttpResponse::new(StatusCode::CREATED)),
+    Err(_) => Err(error::ErrorNotFound("File Not Found")),
   }
 }
 
+/*
 #[put("/<id>", data = "<content>")]
 pub fn put(db_connection: DbConnection, id: i32, content: String) -> Status {
   match Note::put(&db_connection, &id, &content) {

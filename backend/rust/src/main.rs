@@ -31,12 +31,13 @@ async fn main() -> std::io::Result<()> {
 				env::var("DATABASE_URL").expect("Could not find 'DATABASE_URL' in env"),
 			))
 			.wrap(middleware::Compress::default())
-			.service(
-				web::scope("/api")
-					.service(api::notes::get_all)
-					.service(api::notes::get_by_id),
-			)
 			.service(webapp::index)
+			.service(
+				web::scope("/api/notes")
+					.service(api::notes::get_all)
+					.service(api::notes::get_by_id)
+					.service(api::notes::post),
+			)
 			.service(webapp::static_files)
 	})
 	.bind("localhost:8088")?
