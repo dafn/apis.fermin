@@ -16,6 +16,7 @@ mod db;
 mod router;
 
 use actix_web::{middleware, web, App, HttpServer};
+
 use dotenv::dotenv;
 use router::{api, webapp};
 
@@ -25,12 +26,16 @@ use std::env;
 async fn main() -> std::io::Result<()> {
 	dotenv().ok();
 
+	env::set_var("RUST_LOG", "actix_web=info");
+	env_logger::init();
+
 	HttpServer::new(|| {
 		App::new()
 			.data(db::init_connection(
 				env::var("DATABASE_URL").expect("Could not find 'DATABASE_URL' in env"),
 			))
 			.wrap(middleware::Compress::default())
+			.wrap(middleware::Logger::new(" %s | %U"))
 			.service(webapp::index)
 			.service(
 				web::scope("/api/notes")
