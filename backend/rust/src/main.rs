@@ -36,7 +36,9 @@ async fn main() -> std::io::Result<()> {
 				web::scope("/api/notes")
 					.service(api::notes::get_all)
 					.service(api::notes::get_by_id)
-					.service(api::notes::post),
+					.service(api::notes::post)
+					.service(api::notes::put)
+					.service(api::notes::delete),
 			)
 			.service(webapp::static_files)
 	})
