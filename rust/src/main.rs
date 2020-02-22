@@ -15,7 +15,7 @@ mod router;
 use actix_web::{middleware, web, App, HttpServer};
 
 use dotenv::dotenv;
-use router::{api, webapp};
+use router::api;
 
 use std::env;
 
@@ -26,14 +26,18 @@ async fn main() -> std::io::Result<()> {
 	env::set_var("RUST_LOG", "actix_web=info");
 	env_logger::init();
 
-	HttpServer::new(|| {
+	let port: String = match env::var("PORT") {
+		Ok(port) => port,
+		Err(_) => "8088".to_owned()
+	};
+
+	let server = HttpServer::new(|| {
 		App::new()
 			.data(db::init_connection(
 				env::var("DATABASE_URL").expect("Could not find 'DATABASE_URL' in env"),
 			))
 			.wrap(middleware::Compress::default())
-			.wrap(middleware::Logger::new(" %s | %U"))
-			.service(webapp::index)
+			.wrap(middleware::Logger::new("%s | %U"))
 			.service(
 				web::scope("/api/notes")
 					.service(api::notes::get_all)
@@ -42,9 +46,11 @@ async fn main() -> std::io::Result<()> {
 					.service(api::notes::put)
 					.service(api::notes::delete),
 			)
-			.service(webapp::static_files)
 	})
-	.bind("localhost:8088")?
-	.run()
-	.await
+	.bind(format!("localhost:{}", port))?
+	.run();
+
+	println!("Listening to port {}", port);
+
+	server.await
 }
