@@ -1,7 +1,0 @@
-DROP TABLE IF EXISTS notes;
-
-CREATE TABLE notes (
-  id int NOT NULL AUTO_INCREMENT,
-  content TEXT NOT NULL,
-  PRIMARY KEY (id)
-)

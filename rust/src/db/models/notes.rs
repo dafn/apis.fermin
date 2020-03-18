@@ -1,4 +1,5 @@
 use diesel;
+use chrono::{ NaiveDateTime };
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::result::*;
@@ -12,6 +13,7 @@ use serde::{Deserialize, Serialize};
 pub struct Note {
   pub id: i32,
   pub content: String,
+  pub created: NaiveDateTime
 }
 
 #[derive(Insertable)]
