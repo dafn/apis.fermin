@@ -1,3 +1,4 @@
+use chrono::NaiveDateTime;
 use diesel;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
@@ -6,10 +7,14 @@ use diesel::result::*;
 use crate::db::schema::notes as notes_schema;
 use crate::db::schema::notes::dsl::notes;
 
-#[derive(Queryable, RustcDecodable, RustcEncodable)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Queryable, Serialize, Deserialize)]
 pub struct Note {
   pub id: i32,
   pub content: String,
+  pub created: NaiveDateTime,
+  pub last_modified: NaiveDateTime,
 }
 
 #[derive(Insertable)]
@@ -35,9 +40,16 @@ impl Note {
       .execute(connection)
   }
 
-  pub fn put<'a, 'b>(connection: &PgConnection, _id: &'a i32, _content: &'b str) -> Result<Note, Error> {
+  pub fn put<'a, 'b>(
+    connection: &PgConnection,
+    _id: &'a i32,
+    _content: &'b str,
+  ) -> Result<Note, Error> {
     diesel::update(notes.find(_id))
-      .set(notes_schema::content.eq(_content))
+      .set((
+        notes_schema::content.eq(_content),
+        notes_schema::last_modified.eq(chrono::offset::Local::now().naive_local()),
+      ))
       .get_result::<Note>(connection)
   }
 
