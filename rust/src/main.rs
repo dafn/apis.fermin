@@ -17,7 +17,7 @@ use actix_web::{middleware, web, App, HttpServer};
 use dotenv::dotenv;
 use router::api;
 
-use std::env;
+use std::{env};
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -28,7 +28,7 @@ async fn main() -> std::io::Result<()> {
 
 	let port: String = match env::var("PORT") {
 		Ok(port) => port,
-		Err(_) => "8088".to_owned()
+		Err(_) => "8088".to_owned(),
 	};
 
 	let server = HttpServer::new(|| {

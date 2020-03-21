@@ -3,5 +3,6 @@ table! {
         id -> Integer,
         content -> Text,
         created -> Timestamp,
+        last_modified -> Timestamp,
     }
 }

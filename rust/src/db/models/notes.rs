@@ -1,5 +1,5 @@
+use chrono::NaiveDateTime;
 use diesel;
-use chrono::{ NaiveDateTime };
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::result::*;
@@ -13,7 +13,8 @@ use serde::{Deserialize, Serialize};
 pub struct Note {
   pub id: i32,
   pub content: String,
-  pub created: NaiveDateTime
+  pub created: NaiveDateTime,
+  pub last_modified: NaiveDateTime,
 }
 
 #[derive(Insertable)]
@@ -45,7 +46,10 @@ impl Note {
     _content: &'b str,
   ) -> Result<Note, Error> {
     diesel::update(notes.find(_id))
-      .set(notes_schema::content.eq(_content))
+      .set((
+        notes_schema::content.eq(_content),
+        notes_schema::last_modified.eq(chrono::offset::Local::now().naive_local()),
+      ))
       .get_result::<Note>(connection)
   }
 
