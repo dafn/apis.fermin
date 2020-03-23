@@ -48,7 +48,7 @@ impl Note {
     diesel::update(notes.find(_id))
       .set((
         notes_schema::content.eq(_content),
-        notes_schema::last_modified.eq(chrono::offset::Local::now().naive_local()),
+        notes_schema::last_modified.eq(chrono::offset::Utc::now().naive_local()),
       ))
       .get_result::<Note>(connection)
   }
